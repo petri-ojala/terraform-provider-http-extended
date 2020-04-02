@@ -25,8 +25,25 @@ func dataSource() *schema.Resource {
 				},
 			},
 
+			"method": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Default: "GET",
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+
 			"request_headers": {
 				Type:     schema.TypeMap,
+				Optional: true,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
+			},
+
+			"request": {
+				Type:     schema.TypeString,
 				Optional: true,
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
@@ -56,10 +73,12 @@ func dataSourceRead(d *schema.ResourceData, meta interface{}) error {
 
 	url := d.Get("url").(string)
 	headers := d.Get("request_headers").(map[string]interface{})
+	method := d.Get("method").(string)
+	request_body := d.Get("request").(string)
 
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(method, url, strings.NewReader(request_body))
 	if err != nil {
 		return fmt.Errorf("Error creating request: %s", err)
 	}

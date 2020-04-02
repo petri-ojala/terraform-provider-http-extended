@@ -10,7 +10,7 @@ func Provider() terraform.ResourceProvider {
 		Schema: map[string]*schema.Schema{},
 
 		DataSourcesMap: map[string]*schema.Resource{
-			"http": dataSource(),
+			"http-extended": dataSource(),
 		},
 
 		ResourcesMap: map[string]*schema.Resource{},
