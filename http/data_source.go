@@ -34,6 +34,15 @@ func dataSource() *schema.Resource {
 				},
 			},
 
+			"ignore_content_type": {
+                                Type:     schema.TypeBool,
+                                Optional: true,
+				Default: false,
+                                Elem: &schema.Schema{
+                                        Type: schema.TypeBool,
+                                },
+			},
+
 			"request_headers": {
 				Type:     schema.TypeMap,
 				Optional: true,
@@ -94,12 +103,12 @@ func dataSourceRead(d *schema.ResourceData, meta interface{}) error {
 
 	defer resp.Body.Close()
 
-	if resp.StatusCode != 200 {
+	if resp.StatusCode < 200 && resp.StatusCode > 299 {
 		return fmt.Errorf("HTTP request error. Response code: %d", resp.StatusCode)
 	}
 
 	contentType := resp.Header.Get("Content-Type")
-	if contentType == "" || isContentTypeAllowed(contentType) == false {
+	if d.Get("ignore_content_type").(bool) == false && (contentType == "" || isContentTypeAllowed(contentType) == false) {
 		return fmt.Errorf("Content-Type is not a text type. Got: %s", contentType)
 	}
 
